@@ -1,0 +1,53 @@
+version: '2'
+services:
+    db:
+        image: postgres:9.5
+        environment:
+            - POSTGRES=postgres
+            - POSTGRES_USER=odoo
+            - POSTGRES_PASSWORD=odoo
+        volumes:
+            - pg_data:/var/lib/postgresql/data
+    odoo:
+        # build:
+        #     context: ./data
+        #     dockerfile: Dockerfile-dev-$ODOO_VERSION
+        # TODO ver como hacemos par que esto se cambie desde otro lugar
+        image: $ODOO_IMAGE:$ODOO_VERSION
+        external_links:
+            - aeroo:aeroo
+        depends_on:
+            - db
+        ports:
+            - "8069:8069"
+            - "8072:8072"
+        volumes:
+            - ./data/custom-addons/odoo-argentina-11.0:/opt/odoo/custom-addons/odoo-argentina-11.0
+            - ./data/custom-addons/stock-11.0:/opt/odoo/custom-addons/stock-11.0
+            - ./data/custom-addons/account-financial-tools-11.0:/opt/odoo/custom-addons/account-financial-tools-11.0
+            - ./data/custom-addons/account-payment-11.0:/opt/odoo/custom-addons/account-payment-11.0
+            - ./data/custom-addons/argentina-reporting-11.0:/opt/odoo/custom-addons/argentina-reporting-11.0
+            - ./data/custom-addons/argentina-sale-11.0:/opt/odoo/custom-addons/argentina-sale-11.0
+            - ./data/custom-addons/miscellaneous-11.0:/opt/odoo/custom-addons/miscellaneous-11.0
+            - ./data/custom-addons/reporting-engine-11.0:/opt/odoo/custom-addons/reporting-engine-11.0
+            - ./data/custom-addons/aeroo_reports-11.0:/opt/odoo/custom-addons/aeroo_reports-11.0
+            - odoo_data:/opt/odoo/data
+            - ./conf:/opt/odoo/etc
+        env_file:
+            - .env
+        #these extra env items are for nginx-proxy automated reverse proxy
+        #we need to design an automated hostname/dns subsystem 
+        environment:
+            - VIRTUAL_HOST=odoo0.local
+            - VIRTUAL_PORT=8069
+
+#dependency: nginx-proxy must be running before and must create this network
+networks:
+  default:
+    external:
+      name: dockernginxadhoc_backend
+
+volumes:
+    pg_data:
+    odoo_data:
+
