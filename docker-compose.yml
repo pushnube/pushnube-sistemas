@@ -8,6 +8,8 @@ services:
             - POSTGRES_PASSWORD=odoo
         volumes:
             - pg_data:/var/lib/postgresql/data
+            # AGREGO EL INICIO AUTOMÁTICO AL REINICIAR EL SERVIDOR 
+        restart: always
     odoo:
         # build:
         #     context: ./data
@@ -40,6 +42,8 @@ services:
         environment:
             - VIRTUAL_HOST=odoo0.local
             - VIRTUAL_PORT=8069
+            # AGREGO EL INICIO AUTOMÁTICO AL REINICIAR EL SERVIDOR 
+        restart: always
 
 #dependency: nginx-proxy must be running before and must create this network
 networks:
